@@ -9,6 +9,10 @@ const PORT = process.env.PORT || "3000";
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Welcome to Eventify API!");
+});
+
 initdatabase()
   .then(() => {
     app.listen(PORT, () => {
