@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
   host: DB_HOST || "localhost",
   port: Number(DB_PORT) || 5432,
   username: DB_USER || "localhost",
-  password: DB_PASSWORD || "Assa@774623",
+  password: DB_PASSWORD || "1234",
   database: DB_NAME || "eventify_db",
 
   synchronize: false,
@@ -18,7 +18,7 @@ export const AppDataSource = new DataSource({
   migrations: ["src/migration/**/*.ts"],
 });
 
-export const initDB = async () => {
+export const initdatabase = async () => {
   try {
     await AppDataSource.initialize();
     console.log("Database connected!");
