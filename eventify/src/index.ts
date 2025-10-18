@@ -1,20 +1,20 @@
-import { AppDataSource } from "./data-source"
-import { User } from "./entity/User"
+import "reflect-metadata";
+import * as express from "express";
+import * as dotenv from "dotenv";
+import { initDB } from "./config/dataSource.config";
+dotenv.config();
 
-AppDataSource.initialize().then(async () => {
+const app = express();
+const PORT = process.env.PORT || "3000";
 
-    console.log("Inserting a new user into the database...")
-    const user = new User()
-    user.firstName = "Timber"
-    user.lastName = "Saw"
-    user.age = 25
-    await AppDataSource.manager.save(user)
-    console.log("Saved a new user with id: " + user.id)
+app.use(express.json());
 
-    console.log("Loading users from the database...")
-    const users = await AppDataSource.manager.find(User)
-    console.log("Loaded users: ", users)
-
-    console.log("Here you can setup and run express / fastify / any other framework.")
-
-}).catch(error => console.log(error))
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to initialize database:", error);
+  });
