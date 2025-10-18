@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
   host: DB_HOST || "localhost",
   port: Number(DB_PORT) || 5432,
   username: DB_USER || "localhost",
-  password: DB_PASSWORD || "1234",
+  password: DB_PASSWORD || "Assa@774623",
   database: DB_NAME || "eventify_db",
 
   synchronize: false,
