@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { OtpPurpose } from "../enum/otpPurpose.enums";
+import { OtpPurpose } from "../enum/otpPurpose.enum";
 
 @Entity({ name: "otp_tokens" })
 export class OtpToken {
