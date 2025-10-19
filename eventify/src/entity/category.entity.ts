@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Event } from "./event.entity";
 
 @Entity({ name: "categories" })
 export class Category {
