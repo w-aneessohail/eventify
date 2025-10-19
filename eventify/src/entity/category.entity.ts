@@ -8,8 +8,6 @@ import {
 } from "typeorm";
 import { Event } from "./event.entity";
 
-import { Event } from "./event.entity";
-
 @Entity({ name: "categories" })
 export class Category {
   @PrimaryGeneratedColumn()
