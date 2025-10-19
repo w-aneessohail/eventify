@@ -1,5 +1,5 @@
-export class UserRole {
-  ADMIN = "admin";
-  Attendee = "attendee";
-  ORGANIZER = "organizer";
+export enum UserRole {
+  ADMIN = "admin",
+  ATTENDEE = "attendee",
+  ORGANIZER = "organizer",
 }
