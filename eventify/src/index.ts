@@ -2,6 +2,7 @@ import "reflect-metadata";
 import * as express from "express";
 import * as dotenv from "dotenv";
 import { userRouter } from "./route/user.route";
+import { authRouter } from "./route/auth.route";
 import { initdatabase } from "./config/dataSource.config";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 
 app.use("/api", userRouter);
+app.use("/api", authRouter);
 
 initdatabase()
   .then(() => {

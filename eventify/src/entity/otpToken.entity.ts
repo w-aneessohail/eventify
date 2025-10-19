@@ -19,7 +19,7 @@ export class OtpToken {
   purpose: OtpPurpose;
 
   @Column({ nullable: false })
-  otpCode: string;
+  otpCode: number;
 
   @Column({ type: "timestamptz", nullable: false })
   expiresAt: Date;
