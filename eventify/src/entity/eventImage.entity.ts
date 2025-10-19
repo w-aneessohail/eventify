@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Event } from "./event.entity";
 
 @Entity({ name: "event_images" })
 export class EventImage {
@@ -22,4 +25,8 @@ export class EventImage {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Event, (event) => event.images, { onDelete: "CASCADE" })
+  @JoinColumn()
+  event: Event;
 }

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -19,4 +20,7 @@ export class Category {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Event, (event) => event.category)
+  events: Event[];
 }

@@ -2,10 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { OtpPurpose } from "../enum/otpPurpose.enum";
+import { User } from "./user.entity";
 
 @Entity({ name: "otp_tokens" })
 export class OtpToken {
@@ -29,4 +32,8 @@ export class OtpToken {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.otpTokens, { onDelete: "CASCADE" })
+  @JoinColumn()
+  user: User;
 }

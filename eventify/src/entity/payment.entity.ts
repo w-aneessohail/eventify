@@ -2,11 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { PaymentMethod } from "../enum/paymentMethod.enum";
 import { PaymentStatus } from "../enum/paymentStatus.enum";
+import { Booking } from "./booking.entity";
 
 @Entity({ name: "payments" })
 export class Payment {
@@ -38,4 +42,10 @@ export class Payment {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => Booking, (booking) => booking.payments, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
+  booking: Booking;
 }

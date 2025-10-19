@@ -9,6 +9,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { VerificationStatus } from "../enum/verificationStatus.enum";
+import { User } from "./user.entity";
+import { Event } from "./event.entity";
 
 @Entity({ name: "organizers" })
 export class Organizer {
@@ -48,4 +50,11 @@ export class Organizer {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Event, (event) => event.organizer)
+  events: Event[];
+
+  @ManyToOne(() => User, (user) => user.organizers, { onDelete: "CASCADE" })
+  @JoinColumn()
+  user: User;
 }

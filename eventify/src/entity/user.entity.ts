@@ -2,10 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { UserRole } from "../enum/userRole.enum";
+import { Organizer } from "./organizer.entity";
+import { Booking } from "./booking.entity";
+import { EventReview } from "./eventReview.entity";
+import { OtpToken } from "./otpToken.entity";
+import { AuthToken } from "./authToken.entity";
 
 @Entity({ name: "users" })
 export class User {
@@ -35,4 +42,19 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => Organizer, (organizer) => organizer.user)
+  organizers: Organizer;
+
+  @OneToMany(() => Booking, (booking) => booking.attendee)
+  bookings: Booking[];
+
+  @OneToMany(() => EventReview, (review) => review.attendee)
+  reviews: EventReview[];
+
+  @OneToMany(() => OtpToken, (otp) => otp.user)
+  otpTokens: OtpToken[];
+
+  @OneToOne(() => AuthToken, (token) => token.user)
+  authTokens: AuthToken;
 }

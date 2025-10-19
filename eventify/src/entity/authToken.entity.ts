@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { User } from "./user.entity";
 
 @Entity({ name: "auth_tokens" })
 export class AuthToken {
@@ -25,4 +28,8 @@ export class AuthToken {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.authTokens, { onDelete: "CASCADE" })
+  @JoinColumn()
+  user: User;
 }
