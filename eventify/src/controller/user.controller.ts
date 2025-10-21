@@ -46,16 +46,47 @@ export class UserController {
     }
   }
 
+  // static async updateUser(req: Request, res: Response) {
+  //   try {
+  //     const id = Number(req.params.id);
+  //     const updatedUser = await userRepository.updateUser(id, req.body);
+
+  //     if (!updatedUser) {
+  //       return res.status(404).json({ message: "User not found" });
+  //     }
+
+  //     res.status(200).json(updatedUser);
+  //   } catch (error) {
+  //     console.error("Error updating user:", error);
+  //     res.status(500).json({ message: "Error updating user" });
+  //   }
+  // }
+
   static async updateUser(req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
-      const updatedUser = await userRepository.updateUser(id, req.body);
+      const { organizerDetails, userData } = req.body;
+
+      // return res.status(200).json({ organizerDetails, userData });
+
+      // Update the main user
+      const updatedUser = await userRepository.updateUser(id, userData);
 
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json(updatedUser);
+      // Update organizer details if applicable
+      if (organizerDetails && updatedUser.role === UserRole.ORGANIZER) {
+        const info = await organizerRepository.updateOrganizerByUserId(
+          id,
+          organizerDetails
+        );
+      }
+
+      // Return updated user with organizer loaded
+      const userWithOrganizer = await userRepository.findById(id);
+      res.status(200).json(userWithOrganizer);
     } catch (error) {
       console.error("Error updating user:", error);
       res.status(500).json({ message: "Error updating user" });

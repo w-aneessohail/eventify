@@ -22,16 +22,31 @@ export class OrganizerService {
     return this.organizerRepository.save(organizer);
   }
 
-  async updateOrganizer(
-    id: number,
+  // async updateOrganizer(
+  //   id: number,
+  //   organizerData: Partial<Organizer>
+  // ): Promise<Organizer | null> {
+  //   const organizer = await this.organizerRepository.findOneBy({ id });
+  //   if (!organizer) return null;
+
+  //   this.organizerRepository.merge(organizer, organizerData);
+  //   await this.organizerRepository.save(organizer);
+  //   return this.findById(id);
+  // }
+
+  async updateOrganizerByUserId(
+    userId: number,
     organizerData: Partial<Organizer>
-  ): Promise<Organizer | null> {
-    const organizer = await this.organizerRepository.findOneBy({ id });
+  ) {
+    const organizer = await this.organizerRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ["user"],
+    });
+
     if (!organizer) return null;
 
     this.organizerRepository.merge(organizer, organizerData);
-    await this.organizerRepository.save(organizer);
-    return this.findById(id);
+    return this.organizerRepository.save(organizer);
   }
 
   async deleteOrganizer(id: number): Promise<boolean> {
