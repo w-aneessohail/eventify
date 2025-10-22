@@ -29,17 +29,24 @@ export class UserController {
           message: "Organizer details are required when role is ORGANIZER",
         });
       }
-
       const newUser = await userRepository.createUser({ ...userData, role });
 
       if (role === UserRole.ORGANIZER && organizerDetails) {
-        await organizerRepository.createOrganizer({
+        const newOrganizer = await organizerRepository.createOrganizer({
           ...organizerDetails,
           user: newUser,
         });
+        return res.status(200).json({
+          message: "organizer created Successfully wait for approval",
+          newUser,
+          newOrganizer,
+        });
       }
 
-      res.status(201).json(newUser);
+      res.status(201).json({
+        message: "User Created Successfully ",
+        user: newUser,
+      });
     } catch (error) {
       console.error("Error creating user:", error);
       res.status(500).json({ message: "Error creating user" });
@@ -65,12 +72,12 @@ export class UserController {
   static async updateUser(req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
-      const { organizerDetails, userData } = req.body;
+      const { organizerDetails } = req.body;
 
       // return res.status(200).json({ organizerDetails, userData });
 
       // Update the main user
-      const updatedUser = await userRepository.updateUser(id, userData);
+      const updatedUser = await userRepository.updateUser(id, req.body);
 
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });

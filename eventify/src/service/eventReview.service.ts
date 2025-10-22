@@ -6,14 +6,14 @@ export class EventReviewService {
 
   async findAll(): Promise<EventReview[]> {
     return this.reviewRepository.find({
-      relations: ["event", "user"],
+      relations: ["event", "attendee"],
     });
   }
 
   async findById(id: number): Promise<EventReview | null> {
     return this.reviewRepository.findOne({
       where: { id },
-      relations: ["event", "user"],
+      relations: ["event", "attendee"],
     });
   }
 
