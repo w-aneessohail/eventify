@@ -1,12 +1,30 @@
 import * as express from "express";
 import { EventReviewController } from "../controller/eventReview.controller";
+import { UserRole } from "../enum/userRole.enum";
+import { authentication } from "../middleware/authentication";
+import { authorization } from "../middleware/authorization";
 
-const router = express.Router();
+const Router = express.Router();
 
-router.get("/event-reviews", EventReviewController.getAllReviews);
-router.get("/event-reviews/:id", EventReviewController.getReviewById);
-router.post("/event-reviews", EventReviewController.createReview);
-router.put("/event-reviews/:id", EventReviewController.updateReview);
-router.delete("/event-reviews/:id", EventReviewController.deleteReview);
+Router.get("/event-reviews", EventReviewController.getAllReviews);
+Router.get("/event-reviews/:id", EventReviewController.getReviewById);
+Router.post(
+  "/event-reviews",
+  authentication,
+  authorization([UserRole.ATTENDEE]),
+  EventReviewController.createReview
+);
+Router.put(
+  "/event-reviews/:id",
+  authentication,
+  authorization([UserRole.ATTENDEE]),
+  EventReviewController.updateReview
+);
+Router.delete(
+  "/event-reviews/:id",
+  authentication,
+  authorization([UserRole.ATTENDEE, UserRole.ADMIN]),
+  EventReviewController.deleteReview
+);
 
-export { router as eventReviewRouter };
+export { Router as eventReviewRouter };

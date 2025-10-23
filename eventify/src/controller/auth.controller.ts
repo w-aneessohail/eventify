@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
-import { authTokenRepository, organizerRepository, userRepository } from "../repository/index";
+import {
+  authTokenRepository,
+  organizerRepository,
+  userRepository,
+} from "../repository/index";
 import Encrypt from "../helper/encrypt.helper";
 // import { UserResponseDto } from "../dto/response/user.dto";
 import OtpTokens from "../helper/otp.helper";
@@ -10,75 +14,26 @@ import { OtpPurpose } from "../enum/otpPurpose.enum";
 import { UserRole } from "../enum/userRole.enum";
 
 export class AuthController {
-    static async registerUser(req: Request, res: Response) {
-        const { email, password, role, organizerDetails } = req.body;
-      
-        try {
-          const existing = await userRepository.findByEmail(email);
-      
-          // 🔹 CASE 1: User already exists
-          if (existing) {
-            if (existing.isVerified) {
-              return res
-                .status(409)
-                .json({ message: "User already exists and is verified" });
-            } else {
-              const otp = OtpTokens.generateOtp();
-              await OtpTokens.setOtp({
-                userId: existing.id,
-                purpose: OtpPurpose.REGISTER,
-                code: otp,
-              });
-      
-              try {
-                await Mailer.send({
-                  to: email,
-                  subject: "Your Verification OTP",
-                  html: `<p>Use this OTP to verify your account:</p><h2>${otp}</h2><p>It expires in 10 minutes.</p>`,
-                });
-              } catch (err) {
-                console.log("Failed to send OTP:", (err as Error).message);
-              }
-      
-              return res.status(200).json({
-                message: "Unverified account found. OTP sent to email.",
-              });
-            }
-          }
-      
-          // 🔹 CASE 2: Create a brand-new user
-          const hashed = await Encrypt.hashPassword(password);
-      
-          // ✅ Validate organizer details if role is ORGANIZER
-          if (role === UserRole.ORGANIZER && !organizerDetails) {
-            return res.status(400).json({
-              message: "Organizer details are required when role is ORGANIZER",
-            });
-          }
-      
-          // ✅ Create the user record
-          const user = await userRepository.createUser({
-            ...req.body,
-            password: hashed,
-            isVerified: false,
-          });
-      
-          // ✅ Create organizer record (if applicable)
-          if (role === UserRole.ORGANIZER && organizerDetails) {
-            await organizerRepository.createOrganizer({
-              ...organizerDetails,
-              user, // link the user
-            });
-          }
-      
-          // ✅ Generate OTP and send verification email
+  static async registerUser(req: Request, res: Response) {
+    const { email, password, role, organizerDetails } = req.body;
+
+    try {
+      const existing = await userRepository.findByEmail(email);
+
+      // 🔹 CASE 1: User already exists
+      if (existing) {
+        if (existing.isVerified) {
+          return res
+            .status(409)
+            .json({ message: "User already exists and is verified" });
+        } else {
           const otp = OtpTokens.generateOtp();
           await OtpTokens.setOtp({
-            userId: user.id,
+            userId: existing.id,
             purpose: OtpPurpose.REGISTER,
             code: otp,
           });
-      
+
           try {
             await Mailer.send({
               to: email,
@@ -88,17 +43,65 @@ export class AuthController {
           } catch (err) {
             console.log("Failed to send OTP:", (err as Error).message);
           }
-      
-          return res.status(201).json({
-            user,
-            message: "User created successfully. OTP sent to email.",
+
+          return res.status(200).json({
+            message: "Unverified account found. OTP sent to email.",
           });
-        } catch (error) {
-          console.error("Error registering user:", error);
-          return res.status(500).json({ message: "Error registering user" });
         }
       }
-      
+
+      // 🔹 CASE 2: Create a brand-new user
+      const hashed = await Encrypt.hashPassword(password);
+
+      // ✅ Validate organizer details if role is ORGANIZER
+      if (role === UserRole.ORGANIZER && !organizerDetails) {
+        return res.status(400).json({
+          message: "Organizer details are required when role is ORGANIZER",
+        });
+      }
+
+      // ✅ Create the user record
+      const user = await userRepository.createUser({
+        ...req.body,
+        password: hashed,
+        isVerified: false,
+      });
+
+      // ✅ Create organizer record (if applicable)
+      if (role === UserRole.ORGANIZER && organizerDetails) {
+        await organizerRepository.createOrganizer({
+          ...organizerDetails,
+          user, // link the user
+        });
+      }
+
+      // ✅ Generate OTP and send verification email
+      const otp = OtpTokens.generateOtp();
+      await OtpTokens.setOtp({
+        userId: user.id,
+        purpose: OtpPurpose.REGISTER,
+        code: otp,
+      });
+
+      try {
+        await Mailer.send({
+          to: email,
+          subject: "Your Verification OTP",
+          html: `<p>Use this OTP to verify your account:</p><h2>${otp}</h2><p>It expires in 10 minutes.</p>`,
+        });
+      } catch (err) {
+        console.log("Failed to send OTP:", (err as Error).message);
+      }
+
+      return res.status(201).json({
+        user,
+        message: "User created successfully. OTP sent to email.",
+      });
+    } catch (error) {
+      console.error("Error registering user:", error);
+      return res.status(500).json({ message: "Error registering user" });
+    }
+  }
 
   static async loginUser(req: Request, res: Response) {
     const { email, password } = req.body;
