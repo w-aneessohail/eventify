@@ -41,34 +41,6 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  // async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
-  //   // 1. Load the user along with organizerData relation
-  //   const user = await this.userRepository.findOne({
-  //     where: { id },
-  //     relations: ["organizers"], // ensure nested data is loaded
-  //   });
-
-  //   if (!user) return null;
-
-  //   // 2. Merge top-level user properties
-  //   this.userRepository.merge(user, userData);
-
-  //   // 3. Handle nested organizerData updates
-  //   if (userData.organizers) {
-  //     // Ensure organizerData exists before merging
-  //     user.organizers = {
-  //       ...user.organizers,
-  //       ...userData.organizers,
-  //     };
-  //   }
-
-  //   // 4. Save updated user
-  //   await this.userRepository.save(user);
-
-  //   // 5. Return the updated record (optional, for confirmation)
-  //   return this.findById(id);
-  // }
-
   async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) return null;
@@ -76,7 +48,6 @@ export class UserService {
     this.userRepository.merge(user, userData);
     await this.userRepository.save(user);
 
-    // Return the user with organizer relation loaded
     return this.userRepository.findOne({
       where: { id },
       relations: ["organizers"],

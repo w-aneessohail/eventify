@@ -18,12 +18,10 @@ export class PaymentController {
     try {
       const { amount, method, transactionId, bookingId } = req.body;
 
-      // 1. Validate booking exists
       const booking = await bookingRepository.findById(bookingId);
       if (!booking)
         return res.status(404).json({ message: "Booking not found" });
 
-      // 2. Create payment with booking reference
       const newPayment = await paymentRepository.createPayment({
         amount,
         method,

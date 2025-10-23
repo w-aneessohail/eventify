@@ -1,4 +1,6 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -13,6 +15,11 @@ import { Booking } from "./booking.entity";
 import { EventReview } from "./eventReview.entity";
 import { OtpToken } from "./otpToken.entity";
 import { AuthToken } from "./authToken.entity";
+import * as bcrypt from "bcrypt";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const { SALT_ROUNDS = "10" } = process.env;
 
 @Entity({ name: "users" })
 export class User {
@@ -57,4 +64,13 @@ export class User {
 
   @OneToOne(() => AuthToken, (token) => token.user)
   authTokens: AuthToken;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword(): Promise<void> {
+    if (this.password && !this.password.startsWith("$2b$")) {
+      const salt = await bcrypt.genSalt(Number(SALT_ROUNDS));
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
 }
