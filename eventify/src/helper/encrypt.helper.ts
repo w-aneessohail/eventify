@@ -1,17 +1,10 @@
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
-import { AuthToken } from "../entity/authToken.entity";
-import { authTokenRepository } from "../repository/index";
 dotenv.config();
-const { JWT_SECRET = "", SALT_ROUNDS } = process.env;
+const { JWT_SECRET = "" } = process.env;
 
 export default class Encrypt {
-  static async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(Number(SALT_ROUNDS));
-    return bcrypt.hashSync(password, salt);
-  }
-
   static async comparePassword(
     password: string,
     hashedPassword: string
@@ -24,7 +17,7 @@ export default class Encrypt {
   }
 
   static async generateRefreshToken(payload: any): Promise<string> {
-    return  jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
   }
 
   static verifyToken(token: string): any {
@@ -34,6 +27,6 @@ export default class Encrypt {
     } catch (error) {
       console.error("Token verification failed:", error);
       return null;
-    }
-  }
+    }
+  }
 }

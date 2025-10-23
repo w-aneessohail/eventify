@@ -4,7 +4,6 @@ import { EventImage } from "../entity/eventImage.entity";
 export class EventImageService {
   constructor(private eventImageRepository: Repository<EventImage>) {}
 
-  // ✅ Add multiple images to an event
   async addImages(
     eventId: number,
     images: { imageUrl: string; caption?: string }[]
@@ -15,12 +14,10 @@ export class EventImageService {
     return this.eventImageRepository.save(imageEntities);
   }
 
-  // ✅ Delete all images linked to a specific event
   async deleteImagesByEvent(eventId: number): Promise<void> {
     await this.eventImageRepository.delete({ event: { id: eventId } });
   }
 
-  // ✅ Find all images for a specific event
   async findAllByEvent(eventId: number): Promise<EventImage[]> {
     return this.eventImageRepository.find({
       where: { event: { id: eventId } },
@@ -28,7 +25,6 @@ export class EventImageService {
     });
   }
 
-  // ✅ Find a single image by its ID
   async findById(imageId: number): Promise<EventImage | null> {
     return this.eventImageRepository.findOne({
       where: { id: imageId },
@@ -36,7 +32,6 @@ export class EventImageService {
     });
   }
 
-  // ✅ Update image details (caption or URL)
   async updateImage(
     imageId: number,
     updateData: Partial<{ imageUrl: string; caption: string }>
@@ -49,8 +44,10 @@ export class EventImageService {
       return null;
     }
 
-    // merge existing + new data
-    const updatedImage = this.eventImageRepository.merge(existingImage, updateData);
+    const updatedImage = this.eventImageRepository.merge(
+      existingImage,
+      updateData
+    );
     return this.eventImageRepository.save(updatedImage);
   }
 }

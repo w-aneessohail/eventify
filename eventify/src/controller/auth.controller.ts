@@ -5,11 +5,8 @@ import {
   userRepository,
 } from "../repository/index";
 import Encrypt from "../helper/encrypt.helper";
-// import { UserResponseDto } from "../dto/response/user.dto";
 import OtpTokens from "../helper/otp.helper";
 import Mailer from "../helper/mailer.helper";
-import { AppDataSource } from "../config/dataSource.config";
-import { User } from "../entity/user.entity";
 import { OtpPurpose } from "../enum/otpPurpose.enum";
 import { UserRole } from "../enum/userRole.enum";
 
@@ -20,7 +17,6 @@ export class AuthController {
     try {
       const existing = await userRepository.findByEmail(email);
 
-      // 🔹 CASE 1: User already exists
       if (existing) {
         if (existing.isVerified) {
           return res
@@ -50,32 +46,25 @@ export class AuthController {
         }
       }
 
-      // 🔹 CASE 2: Create a brand-new user
-      const hashed = await Encrypt.hashPassword(password);
-
-      // ✅ Validate organizer details if role is ORGANIZER
       if (role === UserRole.ORGANIZER && !organizerDetails) {
         return res.status(400).json({
           message: "Organizer details are required when role is ORGANIZER",
         });
       }
 
-      // ✅ Create the user record
       const user = await userRepository.createUser({
         ...req.body,
-        password: hashed,
+        password,
         isVerified: false,
       });
 
-      // ✅ Create organizer record (if applicable)
       if (role === UserRole.ORGANIZER && organizerDetails) {
         await organizerRepository.createOrganizer({
           ...organizerDetails,
-          user, // link the user
+          user,
         });
       }
 
-      // ✅ Generate OTP and send verification email
       const otp = OtpTokens.generateOtp();
       await OtpTokens.setOtp({
         userId: user.id,
@@ -114,6 +103,7 @@ export class AuthController {
     if (!user.isVerified) {
       return res.status(403).json({ message: "Email not verified" });
     }
+
     const token = await Encrypt.generateToken({ id: user.id });
     const refreshToken = await Encrypt.generateRefreshToken({ id: user.id });
     await authTokenRepository.revokeUserTokens(user.id);
@@ -133,7 +123,6 @@ export class AuthController {
     }
 
     try {
-      // ⿡ Find refresh token record in DB
       const storedToken = await authTokenRepository.findByToken(refreshToken);
 
       if (!storedToken || storedToken.isRevoked) {
@@ -142,13 +131,11 @@ export class AuthController {
           .json({ message: "Invalid or revoked refresh token" });
       }
 
-      // ⿢ Check expiry
       if (new Date(storedToken.expiresAt) < new Date()) {
         await authTokenRepository.revokeToken(storedToken.id);
         return res.status(401).json({ message: "Refresh token expired" });
       }
 
-      // ⿣ Verify JWT token
       const payload = Encrypt.verifyToken(refreshToken);
       if (!payload) {
         return res
@@ -156,7 +143,6 @@ export class AuthController {
           .json({ message: "Invalid refresh token signature" });
       }
 
-      // ⿤ Revoke old token and create new one
       await authTokenRepository.revokeToken(storedToken.id);
 
       const newAccessToken = await Encrypt.generateToken({ id: payload.id });
@@ -164,15 +150,13 @@ export class AuthController {
         id: payload.id,
       });
 
-      // ⿥ Store new refresh token in DB
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       await authTokenRepository.createAuthToken({
         user: storedToken.user,
         refreshToken: newRefreshToken,
         expiresAt,
       });
 
-      // ⿦ Send response
       return res.status(200).json({
         message: "Tokens refreshed successfully",
         token: newAccessToken,
@@ -256,8 +240,7 @@ export class AuthController {
     if (!done)
       return res.status(400).json({ message: "Invalid or expired OTP" });
 
-    const hashed = await Encrypt.hashPassword(newPassword);
-    await userRepository.updateUser(user.id, { password: hashed });
+    await userRepository.updateUser(user.id, { password: newPassword });
 
     return res.status(200).json({ message: "Password reset successful" });
   }

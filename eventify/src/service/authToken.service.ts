@@ -25,7 +25,6 @@ export class AuthTokenService {
     });
   }
 
-  // ✅ Used in controller.refreshToken()
   async findByToken(refreshToken: string): Promise<AuthToken | null> {
     return this.authRepository.findOne({
       where: { refreshToken },
@@ -33,7 +32,6 @@ export class AuthTokenService {
     });
   }
 
-  // ✅ Updated for cleaner argument usage
   async createAuthToken(data: {
     user: User;
     refreshToken: string;
@@ -55,7 +53,6 @@ export class AuthTokenService {
     return this.authRepository.save(token);
   }
 
-  // ✅ Just renaming for consistency with controller logic
   async revokeUserTokens(userId: number): Promise<void> {
     const tokens = await this.findByUser(userId);
     for (const token of tokens) {
