@@ -14,4 +14,6 @@ Router.post("/forgot-password", AuthController.forgotPassword);
 
 Router.post("/reset-password", AuthController.resetPassword);
 
+Router.post("/logout", AuthController.logoutUser);
+
 export { Router as authRouter };
