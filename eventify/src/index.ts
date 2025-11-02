@@ -9,13 +9,25 @@ import { categoryRouter } from "./route/category.route";
 import { eventReviewRouter } from "./route/eventReview.route";
 import { bookingRouter } from "./route/booking.route";
 import { paymentRouter } from "./route/payment.route";
-
+import * as cors from "cors";
+import * as bodyParser from "body-parser";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || "3000";
+const PORT = process.env.PORT || "5002";
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json());
+
 
 app.use("/api", userRouter);
 app.use("/api", authRouter);

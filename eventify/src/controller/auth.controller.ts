@@ -184,8 +184,6 @@ export class AuthController {
       purpose: OtpPurpose.REGISTER,
       code: otp,
     });
-    if (!done)
-      return res.status(400).json({ message: "Invalid or expired OTP" });
 
     const updated = await userRepository.updateUser(user.id, {
       isVerified: true,
