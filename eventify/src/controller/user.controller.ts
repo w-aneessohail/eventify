@@ -91,4 +91,24 @@ export class UserController {
       res.status(500).json({ message: "Error deleting user" });
     }
   }
+
+  static async getLoggedInUser(req: Request, res: Response) {
+    try {
+      const user = req.headers["user"] as any;
+
+      const foundUser = await userRepository.findById(user.Id);
+
+      if (!foundUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({
+        foundUser,
+        message: "User details fetched successfully",
+      });
+    } catch (error) {
+      console.error("Error fetching logged-in user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
 }
