@@ -1,13 +1,25 @@
-import { Repository } from "typeorm";
-import { Payment } from "../entity/payment.entity";
+import type { Repository } from "typeorm";
+import type { Payment } from "../entity/payment.entity";
 
 export class PaymentService {
   constructor(private paymentRepository: Repository<Payment>) {}
 
-  async getAllPayments(): Promise<Payment[]> {
+  async findAll(
+    whereParams: any = {},
+    skip = 0,
+    limit = 10
+  ): Promise<Payment[]> {
     return this.paymentRepository.find({
+      where: { ...whereParams },
       relations: ["booking"],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limit,
     });
+  }
+
+  async getAllPayments(): Promise<Payment[]> {
+    return this.findAll();
   }
 
   async getPaymentById(id: number): Promise<Payment | null> {

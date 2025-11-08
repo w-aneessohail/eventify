@@ -1,10 +1,20 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { eventReviewRepository } from "../repository";
 
 export class EventReviewController {
   static async getAllReviews(req: Request, res: Response) {
-    const reviews = await eventReviewRepository.findAll();
-    res.status(200).json(reviews);
+    try {
+      const { skip = 0, limit = 10, ...whereParams } = req.query;
+      const reviews = await eventReviewRepository.findAll(
+        whereParams,
+        Number(skip),
+        Number(limit)
+      );
+      res.status(200).json(reviews);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "Error fetching reviews" });
+    }
   }
 
   static async getReviewById(req: Request, res: Response) {

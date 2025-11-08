@@ -11,7 +11,7 @@ import { OtpPurpose } from "../enum/otpPurpose.enum";
 import { UserRole } from "../enum/userRole.enum";
 
 const ACCESS_TOKEN_KEY = "access_token";
-const REFRESH_TOKEN_KEY = "referesh_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
 
 export class AuthController {
   static async registerUser(req: Request, res: Response) {

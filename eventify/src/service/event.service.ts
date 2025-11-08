@@ -1,12 +1,16 @@
-import { Repository } from "typeorm";
-import { Event } from "../entity/event.entity";
+import type { Repository } from "typeorm";
+import type { Event } from "../entity/event.entity";
 
 export class EventService {
   constructor(private eventRepository: Repository<Event>) {}
 
-  async findAll(): Promise<Event[]> {
+  async findAll(whereParams: any = {}, skip = 0, limit = 10): Promise<Event[]> {
     return this.eventRepository.find({
+      where: { ...whereParams },
       relations: ["images", "bookings", "reviews", "organizer", "category"],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limit,
     });
   }
 

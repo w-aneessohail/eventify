@@ -3,6 +3,8 @@ import { EventController } from "../controller/event.controller";
 import { authentication } from "../middleware/authentication";
 import { authorization } from "../middleware/authorization";
 import { UserRole } from "../enum/userRole.enum";
+import { CreateEventValidator } from "../middleware/validator/createEvent.validator";
+import { UpdateEventValidator } from "../middleware/validator/updateEvent.validator";
 
 const Router = express.Router();
 
@@ -12,12 +14,14 @@ Router.post(
   "/events",
   authentication,
   authorization([UserRole.ORGANIZER]),
+  CreateEventValidator,
   EventController.createEvent
 );
 Router.put(
   "/events/:id",
   authentication,
   authorization([UserRole.ORGANIZER]),
+  UpdateEventValidator,
   EventController.updateEvent
 );
 Router.delete(
