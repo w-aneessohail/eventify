@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import * as express from "express";
 import * as dotenv from "dotenv";
+import * as cors from "cors";
+import * as cookieParser from "cookie-parser";
 import { userRouter } from "./route/user.route";
 import { authRouter } from "./route/auth.route";
 import { initdatabase } from "./config/dataSource.config";
@@ -9,22 +11,24 @@ import { categoryRouter } from "./route/category.route";
 import { eventReviewRouter } from "./route/eventReview.route";
 import { bookingRouter } from "./route/booking.route";
 import { paymentRouter } from "./route/payment.route";
-import * as cors from "cors";
-import * as bodyParser from "body-parser";
+// import "./types/express";
+
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || "5002";
+const PORT = process.env.PORT || "3000";
+app.use(cookieParser());
 
 app.use(
   cors({
     origin: "http://localhost:5173",
-    optionsSuccessStatus: 200,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -40,9 +44,9 @@ app.use("/api", paymentRouter);
 initdatabase()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
-    console.error("Failed to initialize database:", error);
+    console.error("❌ Failed to initialize database:", error);
   });

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { userRepository, organizerRepository } from "../repository";
 import { UserRole } from "../enum/userRole.enum";
+import { constants } from "os";
 
 export class UserController {
   static async getAllUsers(req: Request, res: Response) {
@@ -89,6 +90,28 @@ export class UserController {
     } catch (error) {
       console.error("Error deleting user:", error);
       res.status(500).json({ message: "Error deleting user" });
+    }
+  }
+
+  static async getLoggedInUser(req: Request, res: Response) {
+    try {
+      const user = req.headers["user"] as any;
+
+      const foundUser = await userRepository.findById(user.id);
+
+     
+
+      if (!foundUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({
+        foundUser,
+        message: "User details fetched successfully",
+      });
+    } catch (error) {
+      console.error("Error fetching logged-in user:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 }

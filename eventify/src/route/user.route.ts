@@ -26,5 +26,6 @@ Router.delete(
   authorization([UserRole.ADMIN]),
   UserController.deleteUser
 );
+Router.get("/profile", authentication, UserController.getLoggedInUser);
 
 export { Router as userRouter };

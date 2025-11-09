@@ -10,6 +10,9 @@ import Mailer from "../helper/mailer.helper";
 import { OtpPurpose } from "../enum/otpPurpose.enum";
 import { UserRole } from "../enum/userRole.enum";
 
+const ACCESS_TOKEN_KEY = "access_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+
 export class AuthController {
   static async registerUser(req: Request, res: Response) {
     const { email, password, role, organizerDetails } = req.body;
@@ -106,18 +109,36 @@ export class AuthController {
 
     const token = await Encrypt.generateToken({ id: user.id });
     const refreshToken = await Encrypt.generateRefreshToken({ id: user.id });
+
     await authTokenRepository.revokeUserTokens(user.id);
+
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await authTokenRepository.createAuthToken({
       user,
       refreshToken,
       expiresAt,
     });
-    res.status(200).json({ user, token, refreshToken });
+
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ user, message: "Login successful" });
   }
 
   static async refreshToken(req: Request, res: Response) {
-    const { refreshToken } = req.body;
+    const refreshToken =
+      req.cookies.refresh_token || req.body.refreshToken || "";
+
     if (!refreshToken) {
       return res.status(400).json({ message: "Refresh token is required" });
     }
@@ -157,10 +178,22 @@ export class AuthController {
         expiresAt,
       });
 
+      // ✅ Refresh cookies
+      res.cookie("access_token", newAccessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.cookie("refresh_token", newRefreshToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
       return res.status(200).json({
         message: "Tokens refreshed successfully",
-        token: newAccessToken,
-        refreshToken: newRefreshToken,
       });
     } catch (error) {
       console.error("Error refreshing token:", error);
@@ -185,9 +218,8 @@ export class AuthController {
       code: otp,
     });
 
-    const updated = await userRepository.updateUser(user.id, {
-      isVerified: true,
-    });
+    await userRepository.updateUser(user.id, { isVerified: true });
+
     return res.status(200).json({
       user,
       message: "Email verified successfully",
@@ -207,6 +239,7 @@ export class AuthController {
       purpose: OtpPurpose.RESET_PASSWORD,
       code: otp,
     });
+
     try {
       await Mailer.send({
         to: email,
@@ -216,6 +249,7 @@ export class AuthController {
     } catch (err) {
       console.log("Failed to send reset OTP:", (err as Error).message);
     }
+
     return res.status(200).json({ message: "Reset OTP sent to email" });
   }
 
@@ -241,5 +275,32 @@ export class AuthController {
     await userRepository.updateUser(user.id, { password: newPassword });
 
     return res.status(200).json({ message: "Password reset successful" });
+  }
+  // static async logoutUser(req: Request, res: Response) {
+  //   const cookieOptions = {
+  //     httpOnly: true,
+  //     sameSite: "lax",  // MUST match how you set it
+  //     secure: false,    // MUST match (false for localhost)
+  //     path: "/",        // include if you used default path
+  //   };
+  
+  //   res.clearCookie("access_token", cookieOptions);
+  //   res.clearCookie("refresh_token", cookieOptions);
+  
+  //   res.status(200).json({ message: "Logged out successfully" });
+  // }
+  
+
+  static async logoutUser(req: Request, res: Response) {
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: "lax",  // MUST match how you set it
+      secure: false,    // MUST match (false for localhost)
+      path: "/",        // include if you used default path
+    };
+   
+    res.clearCookie(ACCESS_TOKEN_KEY);
+    res.clearCookie(REFRESH_TOKEN_KEY);
+    res.status(200).json({ message: "Logged out successfully" });
   }
 }
