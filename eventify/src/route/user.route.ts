@@ -3,6 +3,7 @@ import { UserController } from "../controller/user.controller";
 import { authentication } from "../middleware/authentication";
 import { authorization } from "../middleware/authorization";
 import { UserRole } from "../enum/userRole.enum";
+import { CreateUserValidator } from "../middleware/validator/createUser.validator";
 
 const Router = express.Router();
 
@@ -17,6 +18,7 @@ Router.post(
   "/users",
   authentication,
   authorization([UserRole.ADMIN]),
+  CreateUserValidator,
   UserController.createUser
 );
 Router.put("/users/:id", authentication, UserController.updateUser);

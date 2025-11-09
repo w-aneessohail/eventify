@@ -1,11 +1,12 @@
-import { Repository } from "typeorm";
-import { User } from "../entity/user.entity";
+import type { Repository } from "typeorm";
+import type { User } from "../entity/user.entity";
 
 export class UserService {
   constructor(private userRepository: Repository<User>) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(whereParams: any = {}, skip = 0, limit = 10): Promise<User[]> {
     return this.userRepository.find({
+      where: { ...whereParams },
       relations: [
         "organizers",
         "bookings",
@@ -13,6 +14,9 @@ export class UserService {
         "authTokens",
         "otpTokens",
       ],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limit,
     });
   }
 

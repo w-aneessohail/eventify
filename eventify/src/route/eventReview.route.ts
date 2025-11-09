@@ -3,6 +3,7 @@ import { EventReviewController } from "../controller/eventReview.controller";
 import { UserRole } from "../enum/userRole.enum";
 import { authentication } from "../middleware/authentication";
 import { authorization } from "../middleware/authorization";
+import { CreateEventReviewValidator } from "../middleware/validator/createEventReview.validator";
 
 const Router = express.Router();
 
@@ -12,6 +13,7 @@ Router.post(
   "/event-reviews",
   authentication,
   authorization([UserRole.ATTENDEE]),
+  CreateEventReviewValidator,
   EventReviewController.createReview
 );
 Router.put(

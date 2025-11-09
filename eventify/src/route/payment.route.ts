@@ -3,6 +3,7 @@ import { PaymentController } from "../controller/payment.controller";
 import { UserRole } from "../enum/userRole.enum";
 import { authentication } from "../middleware/authentication";
 import { authorization } from "../middleware/authorization";
+import { CreatePaymentValidator } from "../middleware/validator/createPayment.validator";
 
 const Router = express.Router();
 
@@ -22,6 +23,7 @@ Router.post(
   "/payments",
   authentication,
   authorization([UserRole.ATTENDEE]),
+  CreatePaymentValidator,
   PaymentController.createPayment
 );
 Router.put(

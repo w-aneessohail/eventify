@@ -1,10 +1,15 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { categoryRepository } from "../repository";
 
 export class CategoryController {
   static async getAllCategories(req: Request, res: Response) {
     try {
-      const categories = await categoryRepository.findAll();
+      const { skip = 0, limit = 10, ...whereParams } = req.query;
+      const categories = await categoryRepository.findAll(
+        whereParams,
+        Number(skip),
+        Number(limit)
+      );
       res.status(200).json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);

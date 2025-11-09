@@ -1,10 +1,20 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { paymentRepository, bookingRepository } from "../repository";
 
 export class PaymentController {
   static async getAllPayments(req: Request, res: Response) {
-    const payments = await paymentRepository.getAllPayments();
-    res.status(200).json(payments);
+    try {
+      const { skip = 0, limit = 10, ...whereParams } = req.query;
+      const payments = await paymentRepository.findAll(
+        whereParams,
+        Number(skip),
+        Number(limit)
+      );
+      res.status(200).json(payments);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      res.status(500).json({ message: "Error fetching payments" });
+    }
   }
 
   static async getPaymentById(req: Request, res: Response) {
