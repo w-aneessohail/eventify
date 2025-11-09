@@ -37,5 +37,5 @@ export default class Mailer {
       html,
     };
     return tx.sendMail(payload);
-  }
+  }
 }

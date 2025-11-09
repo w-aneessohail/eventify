@@ -21,11 +21,13 @@ export default class OtpTokens {
     const user = await userRepo.findOneBy({ id: userId });
     if (!user) throw new Error("User not found for OTP");
 
-    const repo = await otpTokenRepository.createOtpToken( user,
-        purpose,
-        code,
-        new Date(Date.now() + ttlMinutes * 60 * 1000));
-    
+    const repo = await otpTokenRepository.createOtpToken(
+      user,
+      purpose,
+      code,
+      new Date(Date.now() + ttlMinutes * 60 * 1000)
+    );
+
     return repo;
   }
 
@@ -47,6 +49,6 @@ export default class OtpTokens {
 
     gotUser.consumedAt = new Date();
     await repo.save(gotUser);
-    return true;
-  }
+    return true;
+  }
 }
