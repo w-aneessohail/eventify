@@ -1,12 +1,20 @@
-import { Repository } from "typeorm";
-import { Booking } from "../entity/booking.entity";
+import type { Repository } from "typeorm";
+import type { Booking } from "../entity/booking.entity";
 
 export class BookingService {
   constructor(private bookingRepository: Repository<Booking>) {}
 
-  async findAll(): Promise<Booking[]> {
+  async findAll(
+    whereParams: any = {},
+    skip = 0,
+    limit = 10
+  ): Promise<Booking[]> {
     return this.bookingRepository.find({
+      where: { ...whereParams },
       relations: ["event", "attendee", "payments"],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limit,
     });
   }
 

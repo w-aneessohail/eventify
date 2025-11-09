@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, Length } from "class-validator";
-import { OtpPurpose } from "../enum/otpPurpose.enum";
+import { OtpPurpose } from "../../enum/otpPurpose.enum";
 
 export class CreateOtpTokenDto {
   @IsEnum(OtpPurpose, { message: "Invalid OTP purpose" })

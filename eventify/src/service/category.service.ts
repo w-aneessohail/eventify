@@ -1,12 +1,20 @@
-import { Repository } from "typeorm";
-import { Category } from "../entity/category.entity";
+import type { Repository } from "typeorm";
+import type { Category } from "../entity/category.entity";
 
 export class CategoryService {
   constructor(private categoryRepository: Repository<Category>) {}
 
-  async findAll(): Promise<Category[]> {
+  async findAll(
+    whereParams: any = {},
+    skip = 0,
+    limit = 10
+  ): Promise<Category[]> {
     return this.categoryRepository.find({
+      where: { ...whereParams },
       relations: ["events"],
+      order: { createdAt: "DESC" },
+      skip,
+      take: limit,
     });
   }
 

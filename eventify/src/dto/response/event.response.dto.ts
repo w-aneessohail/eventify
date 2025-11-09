@@ -7,7 +7,11 @@ export class EventResponseDto {
   ticketPrice: number;
   totalTickets: number;
   status: string;
-  organizerId: number;
+  organizer?: any; // Organizer relation data
+  category?: any; // Category relation data
+  images?: any[]; // Event images
+  bookings?: any[]; // Related bookings
+  reviews?: any[]; // Related reviews
 
   constructor(event: any) {
     this.id = event.id;
@@ -18,6 +22,10 @@ export class EventResponseDto {
     this.ticketPrice = event.ticketPrice;
     this.totalTickets = event.totalTickets;
     this.status = event.status;
-    this.organizerId = event.organizerId;
+    this.organizer = event.organizer ?? null;
+    this.category = event.category ?? null;
+    this.images = event.images ?? [];
+    this.bookings = event.bookings ?? [];
+    this.reviews = event.reviews ?? [];
   }
 }

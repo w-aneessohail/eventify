@@ -1,12 +1,22 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { userRepository, organizerRepository } from "../repository";
 import { UserRole } from "../enum/userRole.enum";
 import { constants } from "os";
 
 export class UserController {
   static async getAllUsers(req: Request, res: Response) {
-    const users = await userRepository.findAll();
-    res.status(200).json(users);
+    try {
+      const { skip = 0, limit = 10, ...whereParams } = req.query;
+      const users = await userRepository.findAll(
+        whereParams,
+        Number(skip),
+        Number(limit)
+      );
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Error fetching users" });
+    }
   }
 
   static async getUserById(req: Request, res: Response) {
@@ -106,7 +116,8 @@ export class UserController {
       }
 
       res.status(200).json({
-        foundUser,
+        user: foundUser,
+        isLoggedIn: true,
         message: "User details fetched successfully",
       });
     } catch (error) {

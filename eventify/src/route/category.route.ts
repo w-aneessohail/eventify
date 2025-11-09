@@ -3,6 +3,7 @@ import { CategoryController } from "../controller/category.controller";
 import { authentication } from "../middleware/authentication";
 import { UserRole } from "../enum/userRole.enum";
 import { authorization } from "../middleware/authorization";
+import { CreateCategoryValidator } from "../middleware/validator/createCategory.validator";
 
 const Router = express.Router();
 
@@ -12,6 +13,7 @@ Router.post(
   "/categories",
   authentication,
   authorization([UserRole.ADMIN]),
+  CreateCategoryValidator,
   CategoryController.createCategory
 );
 Router.put(

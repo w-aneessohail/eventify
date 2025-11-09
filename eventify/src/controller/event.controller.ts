@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { eventRepository, eventImageRepository } from "../repository";
 
 export class EventController {
@@ -22,7 +22,26 @@ export class EventController {
 
   static async getAllEvents(req: Request, res: Response) {
     try {
-      const events = await eventRepository.findAll();
+      const {
+        status,
+        organizerId,
+        categoryId,
+        skip = 0,
+        limit = 10,
+      } = req.query;
+
+      const whereParams: any = {};
+
+      if (status) whereParams.status = status;
+      if (organizerId) whereParams.organizerId = Number(organizerId);
+      if (categoryId) whereParams.categoryId = Number(categoryId);
+
+      const events = await eventRepository.findAll(
+        whereParams,
+        Number(skip),
+        Number(limit)
+      );
+
       res.status(200).json(events);
     } catch (error) {
       console.error("Error fetching events:", error);
