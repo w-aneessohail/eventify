@@ -13,7 +13,7 @@ export default class Encrypt {
   }
 
   static async generateToken(payload: any): Promise<string> {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: "30m" });
   }
 
   static async generateRefreshToken(payload: any): Promise<string> {

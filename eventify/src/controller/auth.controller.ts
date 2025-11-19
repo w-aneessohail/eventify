@@ -178,13 +178,13 @@ export class AuthController {
         expiresAt,
       });
 
-      // ✅ Refresh cookies
       res.cookie("access_token", newAccessToken, {
         httpOnly: true,
         sameSite: "lax",
         secure: false,
         maxAge: 24 * 60 * 60 * 1000,
       });
+
       res.cookie("refresh_token", newRefreshToken, {
         httpOnly: true,
         sameSite: "lax",
@@ -192,8 +192,13 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
+      const user = await userRepository.findById(payload.id);
+
       return res.status(200).json({
         message: "Tokens refreshed successfully",
+        user,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
       });
     } catch (error) {
       console.error("Error refreshing token:", error);

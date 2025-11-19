@@ -109,8 +109,6 @@ export class UserController {
 
       const foundUser = await userRepository.findById(user.id);
 
-     
-
       if (!foundUser) {
         return res.status(404).json({ message: "User not found" });
       }

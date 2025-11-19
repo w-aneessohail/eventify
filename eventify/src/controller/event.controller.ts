@@ -30,11 +30,22 @@ export class EventController {
         limit = 10,
       } = req.query;
 
-      const whereParams: any = {};
+      let whereParams: any = {};
 
-      if (status) whereParams.status = status;
-      if (organizerId) whereParams.organizerId = Number(organizerId);
-      if (categoryId) whereParams.categoryId = Number(categoryId);
+      if (status) {
+        whereParams = { ...whereParams, status };
+      }
+
+      if (organizerId) {
+        whereParams = {
+          ...whereParams,
+          organizer: { id: Number(organizerId) },
+        };
+      }
+
+      if (categoryId) {
+        whereParams = { ...whereParams, category: { id: Number(categoryId) } };
+      }
 
       const events = await eventRepository.findAll(
         whereParams,

@@ -29,7 +29,7 @@ export class Payment {
   @Column({
     type: "enum",
     enum: PaymentStatus,
-    default: PaymentStatus.PENDING,
+    default: PaymentStatus.SUCCESS,
   })
   status: PaymentStatus;
 
