@@ -8,7 +8,7 @@ export const AppDataSource = new DataSource({
   type: "postgres",
   host: DB_HOST || "localhost",
   port: Number(DB_PORT) || 5432,
-  username: DB_USER || "localhost",
+  username: DB_USER || "postgres",
   password: DB_PASSWORD || "1234",
   database: DB_NAME || "eventify_db",
 

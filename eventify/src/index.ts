@@ -44,6 +44,9 @@ app.use("/api", eventReviewRouter);
 app.use("/api", bookingRouter);
 app.use("/api", paymentRouter);
 
+
+
+
 initdatabase()
   .then(() => {
     app.listen(PORT, () => {
