@@ -106,7 +106,7 @@ export class UserController {
     try {
       const user = req.headers["user"] as any;
 
-      const foundUser = await userRepository.findById(user.Id);
+      const foundUser = await userRepository.findById(user.id);
 
       if (!foundUser) {
         return res.status(404).json({ message: "User not found" });

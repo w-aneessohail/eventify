@@ -1,10 +1,5 @@
 import { IsNumber, IsEnum, IsOptional } from "class-validator";
-
-export enum BookingStatus {
-  PENDING = "pending",
-  CONFIRMED = "confirmed",
-  CANCELLED = "cancelled",
-}
+import { BookingStatus } from "../../enum/booking.enum";
 
 export class CreateBookingDto {
   @IsNumber({}, { message: "Event ID must be a number" })
@@ -14,7 +9,7 @@ export class CreateBookingDto {
   attendeeId: number;
 
   @IsNumber({}, { message: "Ticket count must be a number" })
-  ticketCount: number;
+  quantity: number;
 
   @IsNumber({}, { message: "Total amount must be a number" })
   totalAmount: number;

@@ -16,6 +16,9 @@ export class Category {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ type: "varchar", nullable: true })
+  image: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
